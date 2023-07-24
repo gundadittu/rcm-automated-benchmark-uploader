@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-import numpy as np
 import warnings
 import re
 
@@ -274,7 +273,7 @@ def compute_ecw_stats(
     st.write("Total self-pay payments: " + str("${:,.2f}".format(self_pay_payments_sum)))
     st.write("Total patient payments: " + str("${:,.2f}".format(patient_payment_sum)))
 
-    st.toast('Successfully generated benchmark!', icon="✅")
+    st.balloons()
 
 def handle_ecw():
   uploaded_file = st.file_uploader("Upload a 371.05 report", type='csv')

@@ -1,25 +1,15 @@
 import streamlit as st
 
 from constants import EHR
-from ehr_handlers.ecw import handle_ecw
+from ehr_handlers import handle_selected_ehr
 
 st.title('Automated Benchmark Generator')
 
-option = st.selectbox(
+ehr_option = st.selectbox(
     'Select an EHR',
     [ ehr.value for ehr in EHR ]
 )
 
-selected_ehr = EHR[option]
-st.write('You selected:', selected_ehr.value)
-
-benchmark_container = st.container()
-
-with benchmark_container:
-  def handle_selected_ehr(ehr: EHR):
-    if ehr == EHR.ECW:
-      handle_ecw()
-    else:
-      st.write("Selected EHR is not supported yet.")
-  
+if ehr_option:
+  selected_ehr = EHR[ehr_option]
   handle_selected_ehr(selected_ehr)

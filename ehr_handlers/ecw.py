@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import warnings
 import re
+from PIL import Image
 
 def calculate_top_secondary_payers(df_secondary_matched, claim_no_col, insurance_payout_col):
     # Combine rows that have the same "Claim No"
@@ -136,7 +137,6 @@ def compute_ecw_stats(
     df[total_payment_col] = df[total_payment_col].replace({'\$': '', ',': ''}, regex=True).astype(float)
 
     # ----- Calculate Total Payment Metrics ---
-    
     # Exclude rows where Primary Insurance is "Self Pay"
     df_no_self_pay = df[df[primary_ins_col] != 'Self Pay']
 
@@ -277,6 +277,19 @@ def compute_ecw_stats(
 
 def handle_ecw():
   uploaded_file = st.file_uploader("Upload a 371.05 report", type='csv')
+
+  with st.expander("How to download the 371.05 report"):
+    st.write("Log into to ECW -> Menu -> Reports -> eBO Reports")
+    image1 = Image.open('imgs/ecw-2.png')
+    st.image(image1)
+
+    st.write("Search for 371.05 -> Select the version from September 20, 2022")
+    image3 = Image.open('imgs/ecw-3.png')
+    st.image(image3)
+
+    st.write("Use the below filters when generating the 371.05 report")
+    image2 = Image.open('imgs/ecw-1.jpeg')
+    st.image(image2)
   
   if uploaded_file is not None:
       df = pd.read_csv(uploaded_file)

@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import re
+from PIL import Image
 
 def compute_athena_stats(
   data: pd.DataFrame,
@@ -177,6 +178,23 @@ def compute_athena_stats(
 def handle_athena():
   uploaded_file = st.file_uploader("Upload Transaction Activity", type='csv')
   
+  with st.expander("How to download the Transaction Activity report"):
+    st.write("Log into to Athena -> Reports -> Report Builder")
+    image1 = Image.open('imgs/athena-1.png')
+    st.image(image1)
+
+    st.write("Choose Report Type -> Transaction Activity")
+    image4 = Image.open('imgs/athena-3.png')
+    st.image(image4)
+
+    st.write("Choose Display Columns -> Select the columns shown below")
+    image3 = Image.open('imgs/athena-2.jpeg')
+    st.image(image3)
+
+    st.write("Choose & Set Filters -> Select Charge Post Date -> Set your required time frame")
+    image2 = Image.open('imgs/athena-4.png')
+    st.image(image2)
+
   if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
     st.write(data)

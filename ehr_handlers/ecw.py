@@ -205,8 +205,8 @@ def compute_ecw_stats(
             matched_names[name] = best_match
 
     # Map the matched names back to the original data if null
-    df_no_self_pay_no_patient['Primary Insurance Matched'] = df_no_self_pay_no_patient[primary_ins_col].map(matched_names).fillna(df_no_self_pay_no_patient['Primary Insurance'])
-    df_no_self_pay_no_patient['Insurance Matched'] = df_no_self_pay_no_patient[insurer_col].map(matched_names).fillna(df_no_self_pay_no_patient['Insurance'])
+    df_no_self_pay_no_patient['Primary Insurance Matched'] = df_no_self_pay_no_patient[primary_ins_col].map(matched_names).fillna(df_no_self_pay_no_patient[primary_ins_col])
+    df_no_self_pay_no_patient['Insurance Matched'] = df_no_self_pay_no_patient[insurer_col].map(matched_names).fillna(df_no_self_pay_no_patient[insurer_col])
 
 
     df_no_self_pay_no_patient = df_no_self_pay_no_patient[df_no_self_pay_no_patient['Insurance Matched'] != 'patient'];

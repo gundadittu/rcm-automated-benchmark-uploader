@@ -174,6 +174,7 @@ def compute_ecw_stats(
     df_no_self_pay_no_patient = df_no_self_pay_no_patient.applymap(lambda x: "cigna" if isinstance(x, str) and "cigna" in x else x)
     df_no_self_pay_no_patient = df_no_self_pay_no_patient.applymap(lambda x: "aetna" if isinstance(x, str) and "aetna" in x else x)
     df_no_self_pay_no_patient = df_no_self_pay_no_patient.applymap(lambda x: "humana" if isinstance(x, str) and "humana" in x else x)
+    df_no_self_pay_no_patient = df_no_self_pay_no_patient.applymap(lambda x: "ambetter" if isinstance(x, str) and ("ambetter" in x or "allwell" in x or 'magnolia' in x) else x)
 
     df_no_self_pay_no_patient = df_no_self_pay_no_patient.replace(to_replace=r'united', value='umr', regex=True)
     df_no_self_pay_no_patient = df_no_self_pay_no_patient.replace(to_replace=r'.*umr.*', value='umr', regex=True)

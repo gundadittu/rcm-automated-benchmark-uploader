@@ -22,6 +22,9 @@ def calculate_top_secondary_payers(df_secondary_matched, claim_no_col, insurance
     
     # Calculate percentage of all rows
     secondary_insurance_summary_again['Percentage of Payout'] = secondary_insurance_summary_again['Insurance Payout'] / secondary_insurance_summary_again['Insurance Payout'].sum()
+
+    # Rearrange columns
+    secondary_insurance_summary_again = secondary_insurance_summary_again[['Occurrences', 'Average Payout', 'Percentage of Payout', 'Insurance Payout']]
     
     # Sort by total payout
     secondary_insurance_summary_again = secondary_insurance_summary_again.sort_values('Percentage of Payout', ascending=False)
@@ -49,6 +52,9 @@ def calculate_top_primary_payers(df_primary_matched, claim_no_col, insurance_pay
     
     # Calculate percentage of all rows
     primary_insurance_summary_again['Percentage of Payout'] = primary_insurance_summary_again['Insurance Payout'] / primary_insurance_summary_again['Insurance Payout'].sum()
+
+    # Rearrange columns
+    primary_insurance_summary_again = primary_insurance_summary_again[['Occurrences', 'Average Payout', 'Percentage of Payout', 'Insurance Payout']]
     
     # Sort by total payout
     primary_insurance_summary_again = primary_insurance_summary_again.sort_values('Percentage of Payout', ascending=False)
@@ -74,13 +80,16 @@ def calculate_primary_cpt_payments(
     
     # Calculate total payout, number of occurrences, and average payout for each CPT Code
     primary_cpt_summary_again = pd.DataFrame({
-        'Total Payout': grouped_by_primary_cpt_again[insurance_payout_col].sum(),
+        'Insurance Payout': grouped_by_primary_cpt_again[insurance_payout_col].sum(),
         'Occurrences': grouped_by_primary_cpt_again.size(),
         'Average Payout': grouped_by_primary_cpt_again[insurance_payout_col].mean(),
     })
     
     # Calculate percentage of all rows
-    primary_cpt_summary_again['Percentage of Payout'] = primary_cpt_summary_again['Total Payout'] / primary_cpt_summary_again['Total Payout'].sum()
+    primary_cpt_summary_again['Percentage of Payout'] = primary_cpt_summary_again['Insurance Payout'] / primary_cpt_summary_again['Insurance Payout'].sum()
+
+    # Rearrange columns
+    primary_cpt_summary_again = primary_cpt_summary_again[['Occurrences', 'Average Payout', 'Percentage of Payout', 'Insurance Payout']]
     
     # Sort by total payout
     primary_cpt_summary_again = primary_cpt_summary_again.sort_values('Percentage of Payout', ascending=False)
@@ -104,13 +113,16 @@ def calculate_secondary_cpt_payments(
     
     # Calculate total payout, number of occurrences, and average payout for each CPT Code
     secondary_cpt_summary_again = pd.DataFrame({
-        'Total Payout': grouped_by_secondary_cpt_again[insurance_payout_col].sum(),
+        'Insurance Payout': grouped_by_secondary_cpt_again[insurance_payout_col].sum(),
         'Occurrences': grouped_by_secondary_cpt_again.size(),
         'Average Payout': grouped_by_secondary_cpt_again[insurance_payout_col].mean(),
     })
     
     # Calculate percentage of all rows
-    secondary_cpt_summary_again['Percentage of Payout'] = secondary_cpt_summary_again['Total Payout'] / secondary_cpt_summary_again['Total Payout'].sum()
+    secondary_cpt_summary_again['Percentage of Payout'] = secondary_cpt_summary_again['Insurance Payout'] / secondary_cpt_summary_again['Insurance Payout'].sum()
+
+    # Rearrange columns
+    secondary_cpt_summary_again = secondary_cpt_summary_again[['Occurrences', 'Average Payout', 'Percentage of Payout', 'Insurance Payout']]
     
     # Sort by total payout
     secondary_cpt_summary_again = secondary_cpt_summary_again.sort_values('Percentage of Payout', ascending=False)

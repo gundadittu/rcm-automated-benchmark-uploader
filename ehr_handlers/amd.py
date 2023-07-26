@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import re
+from PIL import Image
 
 def compute_amd_stats(
   data: pd.DataFrame,
@@ -14,13 +15,19 @@ def compute_amd_stats(
 ):
   with st.spinner('Generating Benchmark...'):
     st.header('Generated Benchmark Results')
-    data_filtered = data[data[primary_ins_col] != 'SELFPAY']
+    
+    # Remove dollar signs, commas, and parentheses
+    data[insurance_payment_col] = data[insurance_payment_col].replace({'\$': '', ',': '', '\(': '-', '\)': ''}, regex=True).astype(float)
+    data[patient_payment_col] = data[patient_payment_col].replace({'\$': '', ',': '', '\(': '-', '\)': ''}, regex=True).astype(float)
 
+    # Remove self-pay
+    data_filtered = data[data[primary_ins_col].apply(lambda x: 'self' not in str(x).lower())]
+    # data_filtered = data[data[primary_ins_col] != 'SELF PAY']
+  
     # ---- Calculate Total Payment Metrics ----
     total_insurance_payments_filtered = data_filtered[insurance_payment_col].sum()
     total_patient_payments_filtered = data_filtered[patient_payment_col].sum()
     total_unique_visits_filtered = data_filtered[claim_id_col].nunique()
-    st.write(total_insurance_payments_filtered)
     st.write("Total Insurance Payments " + str("${:,.2f}".format(total_insurance_payments_filtered)))
     st.write("Total Patient Payments " + str("${:,.2f}".format(total_patient_payments_filtered)))
     st.write("Total Encounters " + str(total_unique_visits_filtered))
@@ -43,7 +50,7 @@ def compute_amd_stats(
     # ---- Calculate Top Primary Payer Metrics ----
     grouped_by_claim_payer = filtered_df_primary.groupby([claim_id_col, ins_col]).agg({insurance_payment_col: 'sum'}).reset_index()
 
-    grouped_by_payer_again = grouped_by_claim_cpt.groupby(ins_col)
+    grouped_by_payer_again = grouped_by_claim_payer.groupby(ins_col)
 
     payer_summary_again = pd.DataFrame({
         'Total Payout': grouped_by_payer_again[insurance_payment_col].sum(),
@@ -52,7 +59,7 @@ def compute_amd_stats(
     })
 
     total_rows_payer_again = grouped_by_claim_payer.shape[0]
-    payer_summary_again['Percentage of All Rows'] = payer_summary_again['Occurrences'] / total_rows_cpt_again * 100
+    payer_summary_again['Percentage of All Rows'] = payer_summary_again['Occurrences'] / total_rows_payer_again * 100
 
     # Sort by total payout
     payer_summary_again = payer_summary_again.sort_values('Occurrences', ascending=False)
@@ -63,7 +70,7 @@ def compute_amd_stats(
     # ---- Calculate Top Secondary Payer Metrics ----
     grouped_by_claim_payer = filtered_df_secondary.groupby([claim_id_col, ins_col]).agg({insurance_payment_col: 'sum'}).reset_index()
 
-    grouped_by_payer_again = grouped_by_claim_cpt.groupby(ins_col)
+    grouped_by_payer_again = grouped_by_claim_payer.groupby(ins_col)
 
     payer_summary_again = pd.DataFrame({
         'Total Payout': grouped_by_payer_again[insurance_payment_col].sum(),
@@ -72,7 +79,7 @@ def compute_amd_stats(
     })
 
     total_rows_payer_again = grouped_by_claim_payer.shape[0]
-    payer_summary_again['Percentage of All Rows'] = payer_summary_again['Occurrences'] / total_rows_cpt_again * 100
+    payer_summary_again['Percentage of All Rows'] = (payer_summary_again['Occurrences'] / total_rows_payer_again) * 100
 
     # Sort by total payout
     payer_summary_again = payer_summary_again.sort_values('Occurrences', ascending=False)
@@ -124,7 +131,7 @@ def compute_amd_stats(
     insurance_primary = filtered_df_primary.groupby([claim_id_col]).agg({insurance_payment_col: 'sum'}).reset_index()
     insurance_secondary = filtered_df_secondary.groupby([claim_id_col]).agg({insurance_payment_col: 'sum'}).reset_index()
     patient_pay = data_filtered[data_filtered[patient_payment_col] > 0].groupby([claim_id_col]).agg({patient_payment_col: 'sum'}).reset_index()
-    self_pay = data[data[primary_ins_col] == 'SELF PAY']
+    self_pay = data[data[primary_ins_col].apply(lambda x: 'self' in str(x).lower())]
 
     primary_num = len(insurance_primary)
     secondary_num = len(insurance_secondary)
@@ -134,7 +141,7 @@ def compute_amd_stats(
     # Get total $ value
     primary_sum = insurance_primary[insurance_payment_col].sum()
     secondary_sum = insurance_secondary[insurance_payment_col].sum()
-    self_pay_payments_sum = self_pay[insurance_payment_col].sum()
+    self_pay_payments_sum = self_pay[patient_payment_col].sum()
     patient_payment_sum = patient_pay[patient_payment_col].sum()
 
     st.write("Number of primary encounters: " + str(primary_num))
@@ -148,7 +155,18 @@ def compute_amd_stats(
     st.write("Total patient payments: " + str(patient_payment_sum))
 
 def handle_amd():
-  uploaded_file = st.file_uploader("Upload Transaction Detail", type='csv')
+  uploaded_file = st.file_uploader("Upload Transaction Details", type='csv')
+
+  with st.expander("How to download the Transaction Details report"):
+    st.write("Log into to the AMD PM (NOT EHR) -> Reports -> Financial Totals -> Transaction Details")
+    image1 = Image.open('imgs/amd-1.png')
+    st.image(image1)
+    
+    st.write("Set your required \"Low Date\" and \"High Date\"")
+
+    st.write("Select \"Include Charges\" and \"Include Payments\"")
+
+    st.write("Select \"Export on Run\" and set it to \"CSV\"")
   
   if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
